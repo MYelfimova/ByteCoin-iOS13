@@ -8,11 +8,12 @@
 
 import UIKit
 
-class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate, CoinManagerDelegate {
+class ViewController: UIViewController {
     
     @IBOutlet weak var bitcoinLabel: UILabel!
     @IBOutlet weak var currencyLabel: UILabel!
     @IBOutlet weak var currencyPicker: UIPickerView!
+    
     var coinManager = CoinManager()
     
     override func viewDidLoad() {
@@ -21,8 +22,12 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
         currencyPicker.dataSource = self
         currencyPicker.delegate = self
         coinManager.delegate = self
-        
+        coinManager.getCoinPrice(for: "AUD")
     }
+}
+
+//MARK: - CoinManagerDelegate
+extension ViewController: CoinManagerDelegate {
     
     func didUpdateCoinRate(_ coinManager: CoinManager, rate: String) {
         DispatchQueue.main.async {
@@ -31,13 +36,12 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
     }
     
     func didFailWithEror(error: Error?) {
-        print(error)
+        print(error!)
     }
-    
-    func numberOfComponents(in pickerView: UIPickerView) -> Int {
-        return 1
-    }
-    
+}
+
+//MARK: - Picker Delegates
+extension ViewController: UIPickerViewDataSource, UIPickerViewDelegate {
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         return coinManager.currencyArray.count
     }
@@ -50,6 +54,7 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
         currencyLabel.text = selectedCurrency
         coinManager.getCoinPrice(for: selectedCurrency)
     }
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1
+    }
 }
-
-
